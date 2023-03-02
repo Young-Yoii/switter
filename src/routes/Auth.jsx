@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { authService } from '../firebase';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, GithubAuthProvider, signInWithPopup } from 'firebase/auth';
 
 const Auth = () => {
   const [form, setForm] = useState({
@@ -8,6 +8,7 @@ const Auth = () => {
     password: '',
   });
   const [newAccount, setNewAccount] = useState(true);
+  const [error, setError] = useState('');
   const onChange = useCallback(
     (event) => {
       const { name, value } = event.target;
@@ -27,9 +28,25 @@ const Auth = () => {
       } else {
         data = await signInWithEmailAndPassword(authService, form.email, form.password);
       }
-      console.log(data);
     } catch (error) {
-      console.log(error);
+      setError(error.message);
+    }
+  };
+  const toggleAccount = () => setNewAccount((prev) => !prev);
+  const onSocialClick = async (event) => {
+    const { name } = event.target;
+    let provider;
+    try {
+      if (name === 'google') {
+        provider = new GoogleAuthProvider();
+        //const token = credential.accessToken;
+      } else if (name === 'github') {
+        provider = new GithubAuthProvider();
+        //const token = credential.accessToken;
+      }
+      await signInWithPopup(authService, provider);
+    } catch (error) {
+      console.log(error.message);
     }
   };
   return (
@@ -39,8 +56,13 @@ const Auth = () => {
         <input name="password" type="password" placeholder="비빌번호" required value={form.password} onChange={onChange} />
         <input type="submit" value={newAccount ? '계정만들기' : '로그인'} />
       </form>
-      <button>Google 계정으로 로그인</button>
-      <button>Github 계정으로 로그인</button>
+      <span onClick={toggleAccount}>{newAccount ? '로그인' : '계정만들기'}</span>
+      <button name="google" onClick={onSocialClick}>
+        Google 계정으로 로그인
+      </button>
+      <button name="github" onClick={onSocialClick}>
+        Github 계정으로 로그인
+      </button>
     </div>
   );
 };

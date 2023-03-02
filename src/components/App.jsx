@@ -1,13 +1,19 @@
 import Router from './Router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { authService } from '../firebase';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(authService.currentUser);
-  console.log(authService.currentUser);
+  const [init, setInit] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    authService.onAuthStateChanged((user) => {
+      user ? setIsLoggedIn(true) : setIsLoggedIn(false);
+      setInit(true);
+    });
+  }, []);
   return (
     <>
-      <Router isLoggedIn={isLoggedIn} />
+      {init ? <Router isLoggedIn={isLoggedIn} /> : 'loading...'}
       <footer>&copy; {new Date().getFullYear()} Swetter</footer>
     </>
   );
