@@ -33,6 +33,7 @@ const Sweet = ({ sweetObj, isOwner }) => {
       ) : (
         <>
           <h4>{sweetObj.text}</h4>
+          {sweetObj.fileUrl && <img src={sweetObj.fileUrl} alt="img" />}
           {isOwner && (
             <>
               <button onClick={onDeleteClick}>Delete</button>
