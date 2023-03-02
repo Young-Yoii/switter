@@ -7,7 +7,7 @@ import firebase from 'firebase/compat/app';
 const Router = ({ isLoggedIn }) => {
   return (
     <BrowserRouter>
-      <Routes>{isLoggedIn ? <Route path="/" element={<Home />} /> : <Route path="/auth" element={<Auth />} />}</Routes>
+      <Routes>{isLoggedIn === null ? <Route path="/" element={<Auth />} /> : <Route path="/" element={<Home />} />}</Routes>
     </BrowserRouter>
   );
 };
