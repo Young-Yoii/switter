@@ -1,29 +1,27 @@
 import { useState, useEffect } from 'react';
 import { dbService } from './../firebase';
-import { collection, addDoc, serverTimestamp, getDocs, query } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, onSnapshot, orderBy } from 'firebase/firestore';
+import Sweet from './../components/Sweet';
 
-const Home = () => {
+const Home = ({ userObj }) => {
   const [sweet, setSweet] = useState('');
   const [sweets, setSweets] = useState([]);
-  const getSweets = async () => {
-    const dBquery = query(collection(dbService, 'sweets'));
-    const querySnapShot = await getDocs(dBquery);
-    querySnapShot.forEach((doc) => {
-      const sweetObj = {
-        ...doc.data(),
-        id: doc.id,
-      };
-      setSweets((prev) => [sweetObj, ...prev]);
-    });
-  };
   useEffect(() => {
-    getSweets();
+    const dbQuery = query(collection(dbService, 'sweets'), orderBy('createdAt', 'desc'));
+    onSnapshot(dbQuery, (snapshot) => {
+      const sweetArr = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setSweets(sweetArr);
+    });
   }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
     await addDoc(collection(dbService, 'sweets'), {
-      sweet,
+      text: sweet,
       createdAt: serverTimestamp(),
+      creatorId: userObj.uid,
     });
     setSweet('');
   };
@@ -38,9 +36,7 @@ const Home = () => {
         <input type="submit" value="Sweet" />
       </form>
       {sweets.map((sweet) => (
-        <div key={sweet.id}>
-          <h4>{sweet.sweet}</h4>
-        </div>
+        <Sweet key={sweet.id} sweetObj={sweet} isOwner={sweet.creatorId === userObj.uid} />
       ))}
     </div>
   );
