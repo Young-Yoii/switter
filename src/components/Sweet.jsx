@@ -1,5 +1,6 @@
-import { dbService } from '../firebase';
+import { dbService, storageService } from '../firebase';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { deleteObject, ref } from 'firebase/storage';
 import { useState, useCallback } from 'react';
 
 const Sweet = ({ sweetObj, isOwner }) => {
@@ -9,7 +10,15 @@ const Sweet = ({ sweetObj, isOwner }) => {
   const sweetTextRef = doc(dbService, 'sweets', `${sweetObj.id}`);
   const onDeleteClick = async () => {
     const ok = window.confirm('삭제하시겠습니까?');
-    ok && (await deleteDoc(sweetTextRef));
+    if (ok) {
+      try {
+        await deleteDoc(sweetTextRef);
+        imageArr && imageArr.map(async (image) => await deleteObject(ref(storageService, image)));
+      } catch (err) {
+        console.error(err);
+        window.alert('스윗 삭제 실패TT');
+      }
+    }
   };
   const toggleEditing = () => setEditing((prev) => !prev);
   const onChange = useCallback((event) => {

@@ -9,7 +9,6 @@ const Home = ({ userObj }) => {
   const [sweet, setSweet] = useState('');
   const [sweets, setSweets] = useState([]);
   const [images, setImages] = useState([]);
-  const [files, setFiles] = useState([]);
   useEffect(() => {
     const dbQuery = query(collection(dbService, 'sweets'), orderBy('createdAt', 'desc'));
     onSnapshot(dbQuery, (snapshot) => {
@@ -62,7 +61,7 @@ const Home = ({ userObj }) => {
       fileReader.readAsDataURL(file);
     }
   };
-  const onClearImages = () => setImages('');
+  const onClearImages = () => setImages([]);
   return (
     <div>
       <form onSubmit={onSubmit}>
