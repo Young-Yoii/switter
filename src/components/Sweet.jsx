@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 const Sweet = ({ sweetObj, isOwner }) => {
   const [editing, setEditing] = useState(false);
   const [newSweet, setNewSweet] = useState(sweetObj.text);
+  const imageArr = sweetObj.image;
   const sweetTextRef = doc(dbService, 'sweets', `${sweetObj.id}`);
   const onDeleteClick = async () => {
     const ok = window.confirm('삭제하시겠습니까?');
@@ -33,7 +34,7 @@ const Sweet = ({ sweetObj, isOwner }) => {
       ) : (
         <>
           <h4>{sweetObj.text}</h4>
-          {sweetObj.fileUrl && <img src={sweetObj.fileUrl} alt="img" />}
+          {imageArr && imageArr.map((img) => <img src={img} alt="img" />)}
           {isOwner && (
             <>
               <button onClick={onDeleteClick}>Delete</button>
